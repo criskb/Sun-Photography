@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node server/index.js",
     "dev": "node --watch server/index.js",
-    "check": "node --check server/index.js && node --check public/app.js"
+    "check": "node --check server/index.js && find public -name '*.js' -print0 | xargs -0 -n1 node --check"
   },
   "dependencies": {
     "express": "^4.19.2",

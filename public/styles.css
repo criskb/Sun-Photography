@@ -1,72 +1,148 @@
 :root {
-  color-scheme: dark;
-  font-family: Inter, Arial, sans-serif;
+  --bg: #0b1220;
+  --bg-soft: #121b2e;
+  --surface: #152138;
+  --surface-2: #1b2a44;
+  --line: #2a3e60;
+  --text: #f1f5fb;
+  --muted: #9db0cc;
+  --primary: #61d4ff;
+  --primary-ink: #04212d;
+  --shadow: 0 14px 38px rgba(0, 0, 0, 0.28);
+  --radius: 14px;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+}
+
+* {
+  box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  background: #101820;
-  color: #ecf1f8;
+  font-family: Inter, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: radial-gradient(circle at top, #16213a 0%, var(--bg) 50%);
 }
 
-header {
-  padding: 1rem 1.25rem;
-  border-bottom: 1px solid #26374a;
+.topbar {
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--line);
+  background: rgba(11, 18, 32, 0.8);
+  backdrop-filter: blur(8px);
 }
 
-main {
+.topbar h1 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.topbar p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.appLayout {
   display: grid;
-  grid-template-columns: 360px 1fr;
-  min-height: calc(100vh - 90px);
+  grid-template-columns: 380px 1fr;
+  min-height: calc(100vh - 86px);
 }
 
-.controls {
-  padding: 1rem;
-  border-right: 1px solid #26374a;
-  display: flex;
-  flex-direction: column;
-  gap: 0.65rem;
+.panel {
+  padding: var(--space-4);
+  border-right: 1px solid var(--line);
+  overflow: auto;
+  background: linear-gradient(180deg, rgba(10, 17, 30, 0.95), rgba(10, 17, 30, 0.75));
 }
 
-label {
+.workspace {
+  padding: var(--space-4);
+  display: grid;
+  grid-template-rows: 1fr 340px;
+  gap: var(--space-4);
+}
+
+.card {
+  background: linear-gradient(180deg, var(--surface), var(--surface-2));
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.card h2 {
+  margin: 0 0 var(--space-3);
+  font-size: 1rem;
+}
+
+.field {
   display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
   align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
+  color: var(--muted);
 }
 
 input,
-button {
-  background: #172636;
-  color: #ecf1f8;
-  border: 1px solid #2f4861;
-  padding: 0.35rem 0.45rem;
+.btn {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  color: var(--text);
+  background: #0f1a2f;
 }
 
-.buttons {
+input {
+  min-width: 130px;
+}
+
+.btn {
+  cursor: pointer;
+  transition: 0.18s ease;
+}
+
+.btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--primary-ink);
+  border-color: transparent;
+  font-weight: 700;
+}
+
+.btn.is-active {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 1px var(--primary) inset;
+}
+
+.inlineActions {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
 }
 
-.importLabel {
-  border: 1px solid #2f4861;
-  padding: 0.35rem 0.45rem;
-  cursor: pointer;
-}
-
-.importLabel input {
+.importBtn input {
   display: none;
 }
 
-.viewport {
-  display: grid;
-  grid-template-rows: 1fr 360px;
+.helper {
+  color: var(--muted);
+  margin: var(--space-3) 0 0;
+  font-size: 0.9rem;
 }
 
-#threeWrap {
+.visualCard {
   position: relative;
   min-height: 420px;
+  touch-action: none;
+  overflow: hidden;
 }
 
 #three,
@@ -77,22 +153,20 @@ button {
 
 #drawCanvas {
   z-index: 2;
-  cursor: crosshair;
 }
 
-#map {
-  height: 360px;
+.mapCard {
+  height: 340px;
+  margin: 0;
 }
 
 pre {
-  white-space: pre-wrap;
-  background: #0f1a27;
-  border: 1px solid #2f4861;
-  padding: 0.6rem;
-}
-
-.helpText {
-  color: #b8cce0;
-  font-size: 0.9rem;
   margin: 0;
+  white-space: pre-wrap;
+  color: #d4def0;
+  background: #0d172a;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 0.65rem;
+  min-height: 94px;
 }
