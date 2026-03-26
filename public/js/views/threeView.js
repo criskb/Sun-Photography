@@ -62,7 +62,7 @@ export class ThreeView {
     if (this.lastGroundKey === key) return;
     this.lastGroundKey = key;
 
-    const textureUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=15&size=1024x1024&maptype=mapnik`;
+    const textureUrl = `/api/ground-texture?lat=${lat}&lon=${lon}`;
 
     const texture = await new Promise((resolve, reject) => {
       const loader = new THREE.TextureLoader();
@@ -138,12 +138,12 @@ export class ThreeView {
       const dayColor = new THREE.Color().setHSL(hue, 0.7, 0.62);
 
       const geometry = new THREE.BufferGeometry().setFromPoints(points);
-      group.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: dayColor, opacity: 0.22, transparent: true })));
+      group.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: dayColor, opacity: 0.45, transparent: true })));
 
       const selectedPoints = day.samples.filter((sample) => selectedSet.has(sample.timestamp)).map((sample) => this.sampleToVector(sample));
       if (selectedPoints.length > 1) {
         const selectedGeometry = new THREE.BufferGeometry().setFromPoints(selectedPoints);
-        group.add(new THREE.Line(selectedGeometry, new THREE.LineBasicMaterial({ color: 0xf8f8ff, opacity: 0.95, transparent: true })));
+        group.add(new THREE.Line(selectedGeometry, new THREE.LineBasicMaterial({ color: 0xf8f8ff, opacity: 1, transparent: true })));
 
         group.add(
           new THREE.Points(

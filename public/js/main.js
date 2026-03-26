@@ -49,6 +49,7 @@ window.addEventListener('resize', () => {
 
 setTool('rotate');
 setViewport('sky');
+renderAll();
 wireEvents();
 
 function applyCamera() {

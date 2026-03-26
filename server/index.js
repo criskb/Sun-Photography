@@ -113,6 +113,34 @@ app.post('/api/sunpath', (req, res) => {
   }
 });
 
+
+app.get('/api/ground-texture', async (req, res) => {
+  try {
+    const lat = Number(req.query.lat);
+    const lon = Number(req.query.lon);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lon)) {
+      return res.status(400).json({ error: 'lat/lon must be numeric.' });
+    }
+
+    const url = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=15&size=1024x1024&maptype=mapnik`;
+    const upstream = await fetch(url);
+
+    if (!upstream.ok) {
+      return res.status(502).json({ error: 'Failed to fetch terrain texture.' });
+    }
+
+    const contentType = upstream.headers.get('content-type') || 'image/png';
+    const buffer = Buffer.from(await upstream.arrayBuffer());
+
+    res.set('Content-Type', contentType);
+    res.set('Cache-Control', 'public, max-age=3600');
+    return res.send(buffer);
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 app.get('/health', (_req, res) => {
   res.json({ ok: true, now: new Date().toISOString() });
 });
