@@ -9,6 +9,7 @@ export class ThreeView {
     this.pathObject = null;
     this.groundMaterial = null;
     this.lastGroundKey = null;
+    this.sunMarker = null;
   }
 
   init() {
@@ -58,6 +59,15 @@ export class ThreeView {
       new THREE.LineBasicMaterial({ color: 0x9fe4ff })
     );
     this.scene.add(northLine);
+
+    const silhouetteMaterial = new THREE.MeshBasicMaterial({ color: 0x0d1218, transparent: true, opacity: 0.9 });
+    const treeTrunk = new THREE.Mesh(new THREE.CylinderGeometry(0.12, 0.2, 2.8, 8), silhouetteMaterial);
+    treeTrunk.position.set(-6, 1.4, 9);
+    this.scene.add(treeTrunk);
+
+    const treeCanopy = new THREE.Mesh(new THREE.SphereGeometry(1.2, 10, 8), silhouetteMaterial);
+    treeCanopy.position.set(-6, 3.2, 9);
+    this.scene.add(treeCanopy);
 
     window.addEventListener('resize', () => this.resize());
     this.resize();
@@ -166,13 +176,14 @@ export class ThreeView {
     );
   }
 
-  renderTrails(byDay, selectedSamples) {
+  renderTrails(byDay, selectedSamples, progressRatio = 1) {
     if (this.pathObject) this.scene.remove(this.pathObject);
 
     const selectedSet = new Set(selectedSamples.map((sample) => sample.timestamp));
     const group = new THREE.Group();
 
-    byDay.forEach((day, idx) => {
+    const daysToRender = Math.max(1, Math.ceil(byDay.length * Math.max(0.01, Math.min(1, progressRatio))));
+    byDay.slice(0, daysToRender).forEach((day, idx) => {
       if (!day.samples.length) return;
 
       const points = day.samples.map((sample) => this.sampleToVector(sample));
@@ -196,8 +207,28 @@ export class ThreeView {
       }
     });
 
+    
+    const visibleDays = byDay.slice(0, daysToRender);
+    const lastSample = [...visibleDays].reverse().flatMap((day) => day.samples).pop();
+    if (lastSample) {
+      const pos = this.sampleToVector(lastSample);
+      if (!this.sunMarker) {
+        this.sunMarker = new THREE.Mesh(
+          new THREE.SphereGeometry(0.32, 12, 12),
+          new THREE.MeshBasicMaterial({ color: 0xffe69b })
+        );
+        this.scene.add(this.sunMarker);
+      }
+      this.sunMarker.position.copy(pos);
+    }
+
     this.pathObject = group;
     this.scene.add(group);
+  }
+
+
+  getSnapshotDataUrl() {
+    return this.renderer.domElement.toDataURL('image/png');
   }
 
   projectSample(sample) {

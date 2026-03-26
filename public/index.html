@@ -58,6 +58,15 @@
             <button id="applyDrawBtn" class="btn btn-primary">Apply Drawing</button>
           </div>
           <p class="helper">Sky/Ground/Path POV shows sky dome + textured ground + sun path from ground perspective. 3D Ground View keeps a pure map perspective.</p>
+
+          <label class="field">Trail progress % <input id="trailProgress" type="range" min="1" max="100" value="100" /><span id="trailProgressValue">100%</span></label>
+          <div class="inlineActions">
+            <button id="playTrailBtn" class="btn">Play Build-up</button>
+          </div>
+          <div class="inlineActions">
+            <button id="resetViewBtn" class="btn">Reset POV</button>
+            <button id="exportPreviewBtn" class="btn">Export Preview PNG</button>
+          </div>
         </section>
 
         <section class="card">

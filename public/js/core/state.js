@@ -4,5 +4,7 @@ export const state = {
   selectedSamples: [],
   drawPoints: [],
   activeTool: 'rotate',
-  viewportMode: 'sky'
+  viewportMode: 'sky',
+  trailProgress: 1,
+  trailPlayTimer: null
 };

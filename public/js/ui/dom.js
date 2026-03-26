@@ -24,5 +24,10 @@ export const elements = {
   skyViewBtn: document.getElementById('skyViewBtn'),
   ground3dViewBtn: document.getElementById('ground3dViewBtn'),
   three: document.getElementById('three'),
-  groundMap3d: document.getElementById('groundMap3d')
+  groundMap3d: document.getElementById('groundMap3d'),
+  trailProgress: document.getElementById('trailProgress'),
+  playTrailBtn: document.getElementById('playTrailBtn'),
+  trailProgressValue: document.getElementById('trailProgressValue'),
+  resetViewBtn: document.getElementById('resetViewBtn'),
+  exportPreviewBtn: document.getElementById('exportPreviewBtn')
 };

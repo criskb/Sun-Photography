@@ -180,3 +180,16 @@ pre {
 .hidden {
   display: none;
 }
+
+
+input[type='range'] {
+  min-width: 130px;
+  accent-color: var(--primary);
+}
+
+#trailProgressValue {
+  color: var(--primary);
+  font-weight: 700;
+  min-width: 42px;
+  text-align: right;
+}

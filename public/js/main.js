@@ -20,6 +20,7 @@ const mapView = new MapView();
 const ground3DView = new GroundMap3DView();
 
 initializeDates();
+elements.trailProgressValue.textContent = `${elements.trailProgress.value}%`;
 threeView.init();
 threeView.animate();
 mapView.init();
@@ -98,6 +99,7 @@ async function generatePath() {
   state.allSamples = state.session.byDay.flatMap((day) => day.samples);
   state.selectedSamples = [...state.allSamples];
   state.drawPoints = [];
+  state.trailProgress = Number(elements.trailProgress.value) / 100;
 
   renderAll();
 
@@ -113,7 +115,7 @@ async function generatePath() {
 function renderAll() {
   applyCamera();
   const byDay = state.session ? state.session.byDay : [];
-  threeView.renderTrails(byDay, state.selectedSamples);
+  threeView.renderTrails(byDay, state.selectedSamples, state.trailProgress);
   drawOverlay(state.drawPoints);
 
   const lat = state.session ? state.session.location.lat : Number(elements.lat.value);
@@ -152,6 +154,7 @@ function applyDrawingSelection() {
 
 function clearDrawing() {
   state.drawPoints = [];
+  state.trailProgress = Number(elements.trailProgress.value) / 100;
   drawOverlay(state.drawPoints);
 }
 
@@ -254,6 +257,55 @@ function setViewport(mode) {
   ground3DView.resize();
 }
 
+
+function setTrailProgress(value) {
+  const clamped = Math.max(1, Math.min(100, Number(value)));
+  elements.trailProgress.value = clamped;
+  elements.trailProgressValue.textContent = `${clamped}%`;
+  state.trailProgress = clamped / 100;
+  renderAll();
+}
+
+function playTrailBuildUp() {
+  if (state.trailPlayTimer) {
+    clearInterval(state.trailPlayTimer);
+    state.trailPlayTimer = null;
+    elements.playTrailBtn.textContent = 'Play Build-up';
+    return;
+  }
+
+  setTrailProgress(1);
+  elements.playTrailBtn.textContent = 'Stop Build-up';
+  state.trailPlayTimer = setInterval(() => {
+    const next = Number(elements.trailProgress.value) + 2;
+    if (next >= 100) {
+      setTrailProgress(100);
+      clearInterval(state.trailPlayTimer);
+      state.trailPlayTimer = null;
+      elements.playTrailBtn.textContent = 'Play Build-up';
+      return;
+    }
+    setTrailProgress(next);
+  }, 120);
+}
+
+
+function resetPov() {
+  syncCameraInputs(24, 180);
+  setTrailProgress(100);
+  clearDrawing();
+  applyCamera();
+  renderAll();
+}
+
+function exportPreviewPng() {
+  const url = threeView.getSnapshotDataUrl();
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `solargraphy-preview-${new Date().toISOString().slice(0, 10)}.png`;
+  a.click();
+}
+
 function wireEvents() {
   elements.generateBtn.addEventListener('click', async () => {
     try {
@@ -319,4 +371,14 @@ function wireEvents() {
   elements.cameraYaw.addEventListener('change', applyCamera);
   elements.lat.addEventListener('change', renderAll);
   elements.lon.addEventListener('change', renderAll);
+  elements.trailProgress.addEventListener('input', (event) => setTrailProgress(event.target.value));
+  elements.playTrailBtn.addEventListener('click', playTrailBuildUp);
+  elements.resetViewBtn.addEventListener('click', () => {
+    resetPov();
+    setStatus('POV reset to default framing.');
+  });
+  elements.exportPreviewBtn.addEventListener('click', () => {
+    exportPreviewPng();
+    setStatus('Exported current preview PNG.');
+  });
 }
