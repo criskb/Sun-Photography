@@ -20,5 +20,9 @@ export const elements = {
   drawCanvas: document.getElementById('drawCanvas'),
   threeWrap: document.getElementById('threeWrap'),
   rotateToolBtn: document.getElementById('rotateToolBtn'),
-  drawToolBtn: document.getElementById('drawToolBtn')
+  drawToolBtn: document.getElementById('drawToolBtn'),
+  skyViewBtn: document.getElementById('skyViewBtn'),
+  ground3dViewBtn: document.getElementById('ground3dViewBtn'),
+  three: document.getElementById('three'),
+  groundMap3d: document.getElementById('groundMap3d')
 };

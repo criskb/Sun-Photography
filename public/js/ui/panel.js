@@ -30,3 +30,14 @@ export function setToolMode(mode) {
   elements.drawToolBtn.classList.toggle('is-active', mode === 'draw');
   elements.drawCanvas.style.cursor = mode === 'draw' ? 'crosshair' : 'grab';
 }
+
+export function setViewportMode(mode) {
+  const isSky = mode === 'sky';
+
+  elements.skyViewBtn.classList.toggle('is-active', isSky);
+  elements.ground3dViewBtn.classList.toggle('is-active', !isSky);
+
+  elements.three.classList.toggle('hidden', !isSky);
+  elements.drawCanvas.classList.toggle('hidden', !isSky);
+  elements.groundMap3d.classList.toggle('hidden', isSky);
+}

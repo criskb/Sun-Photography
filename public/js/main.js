@@ -1,19 +1,29 @@
 import { state } from './core/state.js';
 import { elements } from './ui/dom.js';
-import { initializeDates, setStatus, getCameraSettings, syncCameraInputs, setToolMode } from './ui/panel.js';
+import {
+  initializeDates,
+  setStatus,
+  getCameraSettings,
+  syncCameraInputs,
+  setToolMode,
+  setViewportMode
+} from './ui/panel.js';
 import { requestSunPath } from './services/sunApi.js';
 import { exportSessionJson, importSessionFile, copyNanoSchedule } from './services/sessionService.js';
 import { ThreeView } from './views/threeView.js';
 import { MapView } from './views/mapView.js';
+import { GroundMap3DView } from './views/groundMap3dView.js';
 import { ViewportTools, drawOverlay } from './tools/viewportTools.js';
 
 const threeView = new ThreeView();
 const mapView = new MapView();
+const ground3DView = new GroundMap3DView();
 
 initializeDates();
 threeView.init();
 threeView.animate();
 mapView.init();
+ground3DView.init();
 applyCamera();
 
 const viewportTools = new ViewportTools({
@@ -33,15 +43,23 @@ viewportTools.init();
 
 window.addEventListener('resize', () => {
   threeView.resize();
+  ground3DView.resize();
   drawOverlay(state.drawPoints);
 });
 
 setTool('rotate');
+setViewport('sky');
 wireEvents();
 
 function applyCamera() {
   const camera = getCameraSettings();
   threeView.applyCamera(camera);
+  ground3DView.setView({
+    lat: Number(elements.lat.value),
+    lon: Number(elements.lon.value),
+    yawDeg: camera.yawDeg
+  });
+
   if (state.session) state.session.camera = camera;
 }
 
@@ -59,7 +77,7 @@ async function generatePath() {
   const data = await requestSunPath(payload);
 
   state.session = {
-    version: 4,
+    version: 5,
     createdAt: new Date().toISOString(),
     selectedInstructions: [],
     camera: getCameraSettings(),
@@ -85,6 +103,11 @@ function renderAll() {
   applyCamera();
   threeView.renderTrails(state.allSamples, state.selectedSamples);
   drawOverlay(state.drawPoints);
+
+  const lat = state.session ? state.session.location.lat : Number(elements.lat.value);
+  const lon = state.session ? state.session.location.lon : Number(elements.lon.value);
+
+  ground3DView.setView({ lat, lon, yawDeg: Number(elements.cameraYaw.value) });
 
   if (state.session) {
     mapView.render(state.session.location.lat, state.session.location.lon, state.selectedSamples);
@@ -182,6 +205,12 @@ function setTool(mode) {
   setToolMode(mode);
 }
 
+function setViewport(mode) {
+  state.viewportMode = mode;
+  setViewportMode(mode);
+  ground3DView.resize();
+}
+
 function wireEvents() {
   elements.generateBtn.addEventListener('click', async () => {
     try {
@@ -194,6 +223,16 @@ function wireEvents() {
   elements.applyViewBtn.addEventListener('click', () => {
     applyCamera();
     setStatus('Applied camera view settings.');
+  });
+
+  elements.skyViewBtn.addEventListener('click', () => {
+    setViewport('sky');
+    setStatus('Sky Trail View active.');
+  });
+
+  elements.ground3dViewBtn.addEventListener('click', () => {
+    setViewport('ground3d');
+    setStatus('3D Ground View active.');
   });
 
   elements.rotateToolBtn.addEventListener('click', () => {
@@ -235,4 +274,6 @@ function wireEvents() {
 
   elements.cameraPitch.addEventListener('change', applyCamera);
   elements.cameraYaw.addEventListener('change', applyCamera);
+  elements.lat.addEventListener('change', renderAll);
+  elements.lon.addEventListener('change', renderAll);
 }

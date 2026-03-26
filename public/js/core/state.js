@@ -3,5 +3,6 @@ export const state = {
   allSamples: [],
   selectedSamples: [],
   drawPoints: [],
-  activeTool: 'rotate'
+  activeTool: 'rotate',
+  viewportMode: 'sky'
 };
