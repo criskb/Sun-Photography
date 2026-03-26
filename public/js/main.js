@@ -101,12 +101,14 @@ async function generatePath() {
 
 function renderAll() {
   applyCamera();
-  threeView.renderTrails(state.allSamples, state.selectedSamples);
+  const byDay = state.session ? state.session.byDay : [];
+  threeView.renderTrails(byDay, state.selectedSamples);
   drawOverlay(state.drawPoints);
 
   const lat = state.session ? state.session.location.lat : Number(elements.lat.value);
   const lon = state.session ? state.session.location.lon : Number(elements.lon.value);
 
+  void threeView.updateGroundTexture(lat, lon);
   ground3DView.setView({ lat, lon, yawDeg: Number(elements.cameraYaw.value) });
 
   if (state.session) {
@@ -142,13 +144,42 @@ function clearDrawing() {
   drawOverlay(state.drawPoints);
 }
 
+
+function buildShutterEvents(samples, intervalMinutes) {
+  const sorted = [...samples].sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  if (!sorted.length) return [];
+
+  const maxGapMs = Math.max(5, intervalMinutes) * 60 * 1000 * 1.5;
+  const events = [];
+  let windowStart = sorted[0];
+  let previous = sorted[0];
+
+  for (let i = 1; i < sorted.length; i += 1) {
+    const current = sorted[i];
+    const gap = new Date(current.timestamp).getTime() - new Date(previous.timestamp).getTime();
+
+    if (gap > maxGapMs) {
+      events.push({ utc: windowStart.timestamp, action: 'OPEN' });
+      events.push({ utc: previous.timestamp, action: 'CLOSE' });
+      windowStart = current;
+    }
+
+    previous = current;
+  }
+
+  events.push({ utc: windowStart.timestamp, action: 'OPEN' });
+  events.push({ utc: previous.timestamp, action: 'CLOSE' });
+
+  return events;
+}
+
 async function exportSession() {
   if (!state.session) {
     setStatus('Generate or import a session first.');
     return;
   }
 
-  state.session.selectedInstructions = state.selectedSamples.map((sample) => ({ utc: sample.timestamp, action: 'PULSE_OPEN' }));
+  state.session.selectedInstructions = buildShutterEvents(state.selectedSamples, Number(elements.intervalMinutes.value));
   state.session.camera = getCameraSettings();
   exportSessionJson(state.session);
   setStatus('Exported session JSON with camera and selected instructions.');
@@ -189,6 +220,7 @@ async function copySchedule() {
 
   const total = await copyNanoSchedule({
     selectedSamples: state.selectedSamples,
+    shutterEvents: buildShutterEvents(state.selectedSamples, Number(elements.intervalMinutes.value)),
     camera: getCameraSettings(),
     servo: {
       openAngle: Number(elements.openAngle.value),
@@ -227,7 +259,7 @@ function wireEvents() {
 
   elements.skyViewBtn.addEventListener('click', () => {
     setViewport('sky');
-    setStatus('Sky Trail View active.');
+    setStatus('Sky + Ground + Path POV active.');
   });
 
   elements.ground3dViewBtn.addEventListener('click', () => {

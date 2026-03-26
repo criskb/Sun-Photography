@@ -23,11 +23,13 @@ export function importSessionFile(file) {
   });
 }
 
-export async function copyNanoSchedule({ selectedSamples, camera, servo }) {
+export async function copyNanoSchedule({ selectedSamples, shutterEvents, camera, servo }) {
   const schedule = {
     servo,
     camera,
-    events: selectedSamples.map((sample) => ({ utc: sample.timestamp, action: 'PULSE_OPEN' }))
+    mode: 'WINDOWED_OPEN_CLOSE',
+    selectedSampleCount: selectedSamples.length,
+    events: shutterEvents
   };
 
   await navigator.clipboard.writeText(JSON.stringify(schedule, null, 2));

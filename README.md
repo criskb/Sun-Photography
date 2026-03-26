@@ -9,7 +9,7 @@ A full-stack starter for long-duration (6+ month) solargraphy planning with a mo
 - **Modular frontend**: UI, API, views, tools, and state split into separate files.
 - **Physically-based sun sampling**: SunCalc solar positions sampled inside daily sunrise/sunset windows.
 - **Three.js + OpenStreetMap**: 3D trail + ground context preview.
-- **Rotate/Draw workflow**: toggle viewport tool for framing or instruction sketching.
+- **Rotate/Draw mask workflow**: toggle viewport tool for framing or instruction sketching.
 - **JSON import/export**: preserve session, camera, and selected instruction events.
 - **Arduino Nano MG90S firmware**: serial-controlled shutter pulses.
 
@@ -77,3 +77,10 @@ Commands:
 - `CLOSE`
 - `PULSE 1500`
 - `CFG 110 10`
+
+
+## Solargraphy Mask Workflow
+
+- Draw a mask on the sky dome from your camera location.
+- Selected sun samples are converted into contiguous OPEN/CLOSE shutter windows.
+- Exported session and Nano schedule include these windowed events.

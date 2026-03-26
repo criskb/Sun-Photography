@@ -7,6 +7,8 @@ export class ThreeView {
     this.camera = null;
     this.renderer = null;
     this.pathObject = null;
+    this.groundMaterial = null;
+    this.lastGroundKey = null;
   }
 
   init() {
@@ -23,15 +25,14 @@ export class ThreeView {
     this.renderer.setSize(container.clientWidth, container.clientHeight);
     container.appendChild(this.renderer.domElement);
 
-    const ground = new THREE.Mesh(
-      new THREE.CircleGeometry(26, 72),
-      new THREE.MeshBasicMaterial({
-        color: 0x1a1f2a,
-        side: THREE.DoubleSide,
-        transparent: true,
-        opacity: 0.45
-      })
-    );
+    this.groundMaterial = new THREE.MeshBasicMaterial({
+      color: 0x1a1f2a,
+      side: THREE.DoubleSide,
+      transparent: true,
+      opacity: 0.9
+    });
+
+    const ground = new THREE.Mesh(new THREE.CircleGeometry(26, 72), this.groundMaterial);
     ground.rotation.x = -Math.PI / 2;
     this.scene.add(ground);
 
@@ -48,12 +49,35 @@ export class ThreeView {
 
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(26, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2),
-      new THREE.MeshBasicMaterial({ color: 0x2d4566, wireframe: true, opacity: 0.45, transparent: true })
+      new THREE.MeshBasicMaterial({ color: 0x2d4566, wireframe: true, opacity: 0.25, transparent: true })
     );
     this.scene.add(dome);
 
     window.addEventListener('resize', () => this.resize());
     this.resize();
+  }
+
+  async updateGroundTexture(lat, lon) {
+    const key = `${lat.toFixed(4)},${lon.toFixed(4)}`;
+    if (this.lastGroundKey === key) return;
+    this.lastGroundKey = key;
+
+    const textureUrl = `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=15&size=1024x1024&maptype=mapnik`;
+
+    const texture = await new Promise((resolve, reject) => {
+      const loader = new THREE.TextureLoader();
+      loader.setCrossOrigin('anonymous');
+      loader.load(textureUrl, resolve, undefined, reject);
+    }).catch(() => null);
+
+    if (!texture) return;
+
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.colorSpace = THREE.SRGBColorSpace;
+
+    this.groundMaterial.map = texture;
+    this.groundMaterial.needsUpdate = true;
   }
 
   resize() {
@@ -100,18 +124,35 @@ export class ThreeView {
     );
   }
 
-  renderTrails(allSamples, selectedSamples) {
+  renderTrails(byDay, selectedSamples) {
     if (this.pathObject) this.scene.remove(this.pathObject);
 
+    const selectedSet = new Set(selectedSamples.map((sample) => sample.timestamp));
     const group = new THREE.Group();
 
-    const full = new THREE.BufferGeometry().setFromPoints(allSamples.map((sample) => this.sampleToVector(sample)));
-    group.add(new THREE.Line(full, new THREE.LineBasicMaterial({ color: 0x7f95af, opacity: 0.7, transparent: true })));
+    byDay.forEach((day, idx) => {
+      if (!day.samples.length) return;
 
-    if (selectedSamples.length > 0) {
-      const selected = new THREE.BufferGeometry().setFromPoints(selectedSamples.map((sample) => this.sampleToVector(sample)));
-      group.add(new THREE.Line(selected, new THREE.LineBasicMaterial({ color: 0xffd35e })));
-    }
+      const points = day.samples.map((sample) => this.sampleToVector(sample));
+      const hue = (0.12 + (idx % 30) / 60) % 1;
+      const dayColor = new THREE.Color().setHSL(hue, 0.7, 0.62);
+
+      const geometry = new THREE.BufferGeometry().setFromPoints(points);
+      group.add(new THREE.Line(geometry, new THREE.LineBasicMaterial({ color: dayColor, opacity: 0.22, transparent: true })));
+
+      const selectedPoints = day.samples.filter((sample) => selectedSet.has(sample.timestamp)).map((sample) => this.sampleToVector(sample));
+      if (selectedPoints.length > 1) {
+        const selectedGeometry = new THREE.BufferGeometry().setFromPoints(selectedPoints);
+        group.add(new THREE.Line(selectedGeometry, new THREE.LineBasicMaterial({ color: 0xf8f8ff, opacity: 0.95, transparent: true })));
+
+        group.add(
+          new THREE.Points(
+            selectedGeometry,
+            new THREE.PointsMaterial({ color: 0xfff3be, size: 0.18, transparent: true, opacity: 0.9 })
+          )
+        );
+      }
+    });
 
     this.pathObject = group;
     this.scene.add(group);
