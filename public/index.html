@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solargraphy Drawer</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <h1>Solargraphy Studio</h1>
+        <p>Modern planner for long-duration solar trails, camera framing, and shutter schedules.</p>
+      </div>
+    </header>
+
+    <main class="appLayout">
+      <aside class="panel">
+        <section class="card">
+          <h2>Capture Setup</h2>
+          <label class="field">Latitude <input id="lat" type="number" step="0.000001" value="40.7128" /></label>
+          <label class="field">Longitude <input id="lon" type="number" step="0.000001" value="-74.0060" /></label>
+          <label class="field">Start date <input id="startDate" type="date" /></label>
+          <label class="field">End date <input id="endDate" type="date" /></label>
+          <label class="field">Interval (minutes) <input id="intervalMinutes" type="number" min="1" max="240" value="30" /></label>
+          <div class="inlineActions">
+            <button id="generateBtn" class="btn btn-primary">Generate Sun Path</button>
+            <button id="exportBtn" class="btn">Export JSON</button>
+            <label class="btn importBtn">
+              Import JSON
+              <input id="importInput" type="file" accept="application/json" />
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Ground Camera</h2>
+          <label class="field">Pitch (°) <input id="cameraPitch" type="number" min="-10" max="89" value="18" /></label>
+          <label class="field">Yaw / Rotation (°) <input id="cameraYaw" type="number" min="0" max="360" value="180" /></label>
+          <button id="applyViewBtn" class="btn">Apply View</button>
+        </section>
+
+        <section class="card">
+          <h2>Viewport Tools</h2>
+          <div class="inlineActions">
+            <button id="rotateToolBtn" class="btn is-active">Rotate Tool</button>
+            <button id="drawToolBtn" class="btn">Draw Tool</button>
+            <button id="clearDrawBtn" class="btn">Clear Drawing</button>
+            <button id="applyDrawBtn" class="btn btn-primary">Apply Drawing</button>
+          </div>
+          <p class="helper">Rotate tool lets you drag for framing. Draw tool marks desired trail segments for instruction generation.</p>
+        </section>
+
+        <section class="card">
+          <h2>Shutter Hardware</h2>
+          <label class="field">Open angle <input id="openAngle" type="number" min="0" max="180" value="110" /></label>
+          <label class="field">Closed angle <input id="closedAngle" type="number" min="0" max="180" value="10" /></label>
+          <label class="field">Pulse open ms <input id="openMs" type="number" min="100" value="1500" /></label>
+          <button id="copyScheduleBtn" class="btn btn-primary">Copy Nano Schedule JSON</button>
+        </section>
+
+        <section class="card">
+          <h2>Status</h2>
+          <pre id="status">Ready.</pre>
+        </section>
+      </aside>
+
+      <section class="workspace">
+        <div id="threeWrap" class="card visualCard">
+          <div id="three"></div>
+          <canvas id="drawCanvas"></canvas>
+        </div>
+        <div id="map" class="card mapCard"></div>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
