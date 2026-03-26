@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solargraphy Drawer</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+      crossorigin=""
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Solargraphy Draw Planner</h1>
+      <p>Plan multi-month sun trails, preview in 3D, and export/import JSON sessions.</p>
+    </header>
+
+    <main>
+      <section class="controls">
+        <h2>Capture Setup</h2>
+        <label>Latitude <input id="lat" type="number" step="0.000001" value="40.7128" /></label>
+        <label>Longitude <input id="lon" type="number" step="0.000001" value="-74.0060" /></label>
+        <label>Start date <input id="startDate" type="date" /></label>
+        <label>End date <input id="endDate" type="date" /></label>
+        <label>Interval (minutes) <input id="intervalMinutes" type="number" min="5" max="240" value="60" /></label>
+
+        <div class="buttons">
+          <button id="generateBtn">Generate Sun Path</button>
+          <button id="exportBtn">Export JSON</button>
+          <label class="importLabel">
+            Import JSON
+            <input id="importInput" type="file" accept="application/json" />
+          </label>
+        </div>
+
+        <h3>Shutter Hardware Plan (MG90S + Nano)</h3>
+        <label>Open angle <input id="openAngle" type="number" min="0" max="180" value="110" /></label>
+        <label>Closed angle <input id="closedAngle" type="number" min="0" max="180" value="10" /></label>
+        <label>Pulse open ms <input id="openMs" type="number" min="100" value="1500" /></label>
+        <button id="copyScheduleBtn">Copy Nano Schedule JSON</button>
+
+        <pre id="status">Ready.</pre>
+      </section>
+
+      <section class="viewport">
+        <div id="three"></div>
+        <div id="map"></div>
+      </section>
+    </main>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

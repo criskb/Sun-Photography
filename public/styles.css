@@ -1,0 +1,80 @@
+:root {
+  color-scheme: dark;
+  font-family: Inter, Arial, sans-serif;
+}
+
+body {
+  margin: 0;
+  background: #101820;
+  color: #ecf1f8;
+}
+
+header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #26374a;
+}
+
+main {
+  display: grid;
+  grid-template-columns: 340px 1fr;
+  min-height: calc(100vh - 90px);
+}
+
+.controls {
+  padding: 1rem;
+  border-right: 1px solid #26374a;
+  display: flex;
+  flex-direction: column;
+  gap: 0.65rem;
+}
+
+label {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+input,
+button {
+  background: #172636;
+  color: #ecf1f8;
+  border: 1px solid #2f4861;
+  padding: 0.35rem 0.45rem;
+}
+
+.buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.importLabel {
+  border: 1px solid #2f4861;
+  padding: 0.35rem 0.45rem;
+  cursor: pointer;
+}
+
+.importLabel input {
+  display: none;
+}
+
+.viewport {
+  display: grid;
+  grid-template-rows: 1fr 360px;
+}
+
+#three {
+  min-height: 360px;
+}
+
+#map {
+  height: 360px;
+}
+
+pre {
+  white-space: pre-wrap;
+  background: #0f1a27;
+  border: 1px solid #2f4861;
+  padding: 0.6rem;
+}
