@@ -15,7 +15,7 @@
   <body>
     <header>
       <h1>Solargraphy Draw Planner</h1>
-      <p>Plan multi-month sun trails, preview in 3D, and export/import JSON sessions.</p>
+      <p>Plan multi-month sun trails, preview in 3D, draw target tracks, and export/import JSON sessions.</p>
     </header>
 
     <main>
@@ -27,6 +27,11 @@
         <label>End date <input id="endDate" type="date" /></label>
         <label>Interval (minutes) <input id="intervalMinutes" type="number" min="5" max="240" value="60" /></label>
 
+        <h3>Fixed Ground View</h3>
+        <label>Camera pitch (°) <input id="cameraPitch" type="number" min="-10" max="89" value="18" /></label>
+        <label>Camera yaw/rotation (°) <input id="cameraYaw" type="number" min="0" max="360" value="180" /></label>
+        <button id="applyViewBtn">Apply View</button>
+
         <div class="buttons">
           <button id="generateBtn">Generate Sun Path</button>
           <button id="exportBtn">Export JSON</button>
@@ -34,6 +39,13 @@
             Import JSON
             <input id="importInput" type="file" accept="application/json" />
           </label>
+        </div>
+
+        <h3>Sky Drawing Controls</h3>
+        <p class="helpText">Draw over the 3D sky view to mark where you want shutter pulses. Clear and redraw anytime.</p>
+        <div class="buttons">
+          <button id="clearDrawBtn">Clear Drawing</button>
+          <button id="applyDrawBtn">Apply Drawing To Schedule</button>
         </div>
 
         <h3>Shutter Hardware Plan (MG90S + Nano)</h3>
@@ -46,7 +58,10 @@
       </section>
 
       <section class="viewport">
-        <div id="three"></div>
+        <div id="threeWrap">
+          <div id="three"></div>
+          <canvas id="drawCanvas"></canvas>
+        </div>
         <div id="map"></div>
       </section>
     </main>

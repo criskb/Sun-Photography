@@ -16,7 +16,7 @@ header {
 
 main {
   display: grid;
-  grid-template-columns: 340px 1fr;
+  grid-template-columns: 360px 1fr;
   min-height: calc(100vh - 90px);
 }
 
@@ -64,8 +64,20 @@ button {
   grid-template-rows: 1fr 360px;
 }
 
-#three {
-  min-height: 360px;
+#threeWrap {
+  position: relative;
+  min-height: 420px;
+}
+
+#three,
+#drawCanvas {
+  position: absolute;
+  inset: 0;
+}
+
+#drawCanvas {
+  z-index: 2;
+  cursor: crosshair;
 }
 
 #map {
@@ -77,4 +89,10 @@ pre {
   background: #0f1a27;
   border: 1px solid #2f4861;
   padding: 0.6rem;
+}
+
+.helpText {
+  color: #b8cce0;
+  font-size: 0.9rem;
+  margin: 0;
 }

@@ -3,19 +3,20 @@
 A full-stack starter for long-duration (6+ month) solargraphy planning with:
 
 - **Node + Express** backend for sun path sample generation.
-- **Three.js** 3D sky dome rendering of the sun trail.
+- **Three.js** fixed ground-angle sky rendering of the sun trail.
 - **OpenStreetMap (Leaflet)** ground map preview at your pinhole location (lat/lon).
+- **Sky drawing-to-instruction workflow** to select where/when shutter pulses happen.
 - **JSON export/import** so a capture plan can be resumed later.
 - **Arduino Nano firmware** to drive an **MG90S servo shutter**.
 
 ## Features
 
 1. Configure latitude/longitude and date range (months long).
-2. Generate daylight-only sun samples with interval control.
-3. Visualize the path in 3D and on a map.
-4. Export the full capture session as JSON.
-5. Import previous JSON session files.
-6. Generate/copy a Nano shutter schedule payload JSON.
+2. Set fixed camera **pitch** and **yaw/rotation** for a ground-level viewpoint.
+3. Generate daylight-only sun samples with interval control.
+4. Draw directly over the sky view to select sample points for shutter instructions.
+5. Export/import full JSON sessions including selected instructions + camera setup.
+6. Copy Nano schedule JSON payload for firmware-side execution.
 
 ## Install & Run
 
@@ -42,32 +43,15 @@ Request body:
 }
 ```
 
-Response:
+Response includes `byDay` samples with `timestamp`, `altitudeDeg`, and `azimuthDeg`.
 
-```json
-{
-  "generatedAt": "2026-03-26T12:00:00.000Z",
-  "location": { "lat": 40.7128, "lon": -74.006 },
-  "schedule": {
-    "startDate": "2026-03-26T00:00:00.000Z",
-    "endDate": "2026-09-26T23:59:59.000Z",
-    "intervalMinutes": 60
-  },
-  "samplesCount": 1234,
-  "byDay": [
-    {
-      "date": "2026-03-26",
-      "samples": [
-        {
-          "timestamp": "2026-03-26T11:00:00.000Z",
-          "altitudeDeg": 10.2,
-          "azimuthDeg": 95.1
-        }
-      ]
-    }
-  ]
-}
-```
+## Sky Draw Workflow
+
+1. Generate a sun path.
+2. Adjust camera pitch/yaw and click **Apply View**.
+3. Draw over the sky trajectory in the top viewport.
+4. Click **Apply Drawing To Schedule** to filter instruction events.
+5. Copy Nano schedule JSON or export session JSON.
 
 ## Arduino Nano + MG90S
 
@@ -91,6 +75,7 @@ The browser exports a JSON session with:
 - location
 - date schedule
 - sun samples grouped by day
-- metadata for reproducibility over long captures
+- camera pitch/yaw
+- selected instruction events from the drawing overlay
 
 You can re-import to continue planning months later.
