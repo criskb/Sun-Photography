@@ -51,6 +51,16 @@ setTool('rotate');
 setViewport('sky');
 renderAll();
 wireEvents();
+bootstrap();
+
+
+async function bootstrap() {
+  try {
+    await generatePath();
+  } catch (error) {
+    setStatus(`Startup generation failed: ${error.message}`);
+  }
+}
 
 function applyCamera() {
   const camera = getCameraSettings();

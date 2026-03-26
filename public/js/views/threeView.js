@@ -49,9 +49,15 @@ export class ThreeView {
 
     const dome = new THREE.Mesh(
       new THREE.SphereGeometry(26, 48, 24, 0, Math.PI * 2, 0, Math.PI / 2),
-      new THREE.MeshBasicMaterial({ color: 0x2d4566, wireframe: true, opacity: 0.25, transparent: true })
+      new THREE.MeshBasicMaterial({ color: 0x3c6aa0, wireframe: true, opacity: 0.45, transparent: true })
     );
     this.scene.add(dome);
+
+    const northLine = new THREE.Line(
+      new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0.02, 0), new THREE.Vector3(0, 0.02, 24)]),
+      new THREE.LineBasicMaterial({ color: 0x9fe4ff })
+    );
+    this.scene.add(northLine);
 
     window.addEventListener('resize', () => this.resize());
     this.resize();
@@ -70,7 +76,13 @@ export class ThreeView {
       loader.load(textureUrl, resolve, undefined, reject);
     }).catch(() => null);
 
-    if (!texture) return;
+    if (!texture) {
+      if (!this.groundMaterial.map) {
+        this.groundMaterial.map = this.createFallbackGroundTexture();
+        this.groundMaterial.needsUpdate = true;
+      }
+      return;
+    }
 
     texture.wrapS = THREE.ClampToEdgeWrapping;
     texture.wrapT = THREE.ClampToEdgeWrapping;
@@ -78,6 +90,36 @@ export class ThreeView {
 
     this.groundMaterial.map = texture;
     this.groundMaterial.needsUpdate = true;
+  }
+
+
+  createFallbackGroundTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 512;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = '#1a2330';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.strokeStyle = '#2f4868';
+    ctx.lineWidth = 1;
+    for (let i = 0; i <= 16; i += 1) {
+      const t = (i / 16) * canvas.width;
+      ctx.beginPath();
+      ctx.moveTo(t, 0);
+      ctx.lineTo(t, canvas.height);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(0, t);
+      ctx.lineTo(canvas.width, t);
+      ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.colorSpace = THREE.SRGBColorSpace;
+    return tex;
   }
 
   resize() {
